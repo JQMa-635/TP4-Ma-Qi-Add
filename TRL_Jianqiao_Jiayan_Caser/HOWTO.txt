@@ -1,0 +1,5 @@
+Run TRLApp.java
+
+On the first several lines, student IDs and copy IDs are provided for testing.
+
+All functionalities have prompts in UI layer.
