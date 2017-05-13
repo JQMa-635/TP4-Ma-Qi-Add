@@ -19,17 +19,4 @@ public class PatronStore
 	{
 		return patronHash.get(patronID); // null if not there
 	}
-
-//	public static void main(String[] args)
-//	{
-//		PatronStore pStore = new PatronStore();
-//
-//		Patron p = pStore.fetchPatron("S001");
-//		System.out.println(p.toString());
-//
-//		Copy c = new Copy("4747");
-//		p.checkCopyOut(c);
-//
-//		System.out.println(p);
-//	}
 }
