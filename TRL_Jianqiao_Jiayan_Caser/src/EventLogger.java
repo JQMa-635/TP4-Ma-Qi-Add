@@ -14,13 +14,6 @@ class EventLogger
 		eventLog.add(s);
 	}
 	
-	public void showLog()
-	{
-		for (int i = 0; i < eventLog.size(); i++)
-		{
-			System.out.println("Entry " + i + " :" + eventLog.get(i) +"\n");
-		}
-	}
 	
 	public ArrayList<String> getLog()
 	{
