@@ -8,20 +8,23 @@ public class PatronTest
 {
 	private Copy c;
 	private Copy c2;
-	private Patron p;
-
+	private Patron p, p2;
+	private Hold h;
+	private UIController uiController;
+	private InController inController;
+	private CopyStore cs;
+	private PatronStore ps;
+	
 	@Before
 	public void setUp() throws Exception
 	{
-//		StdOut.println("setUp() called");
 		p = new Patron("Uncle Bob","4747");
-		// Patron p2 = new Patron("Uncle Bob","4747");
-//		StdOut.println(p.equals(p2));
-//		StdOut.println(p==p2);
-//		
+		p2 = new Patron("Uncle Sam", "2017");
 		c = new Copy("001");
 		c2 = new Copy("002");
-	
+		uiController = new UIController();
+		inController = new InController(ps, cs);
+		h = new Hold(1);
 	}
 
 	@After
@@ -32,7 +35,6 @@ public class PatronTest
 	@Test
 	public void testCheckCopyOut()
 	{
-//		StdOut.println("testCheckCopyOut called");
 		
 		p.checkCopyOut(c);
 		
@@ -45,7 +47,6 @@ public class PatronTest
 	@Test
 	public void testCheckSecondCopyOut()
 	{
-//		StdOut.println("testCheckCopyOut called");
 		
 		p.checkCopyOut(c);
 		p.checkCopyOut(c2);
@@ -57,8 +58,36 @@ public class PatronTest
 	@Test
 	public void testCheckCopyIn()
 	{
-//		StdOut.println("testCheckCopyOut called");
-		fail("Not yet implemented");
+		p.checkCopyOut(c);
+		p.checkCopyIn(c);
+		assertTrue("Copies checked in from patron", c.getOutTo() == null);
+		assertTrue("Patron doesn't have copy", p.getCopiesOut().isEmpty());
 	}
+	
+	@Test
+	public void testIsSamePatron()
+	{
+		assertTrue("If is same patron", p == p);
+		assertTrue("If is different patron", !(p == p2));
+	}
+	
+	@Test
+	public void testGetCopiesOut()
+	{
+		p.checkCopyOut(c);
+		assertEquals("Get the first out copy", p.getCopiesOut().get(0), c);
+	}
+	
+	
+	@Test
+	public void testAddAndRemoveHold()
+	{
+		p.addHold(h);
+		assertEquals("One hold", p.getHolds().get(0).getHoldName(), h.getHoldName());
+		p.removeHold(h);
+		assertTrue("If no holds", p.getHolds().isEmpty());
+	}
+	
+	
 
 }

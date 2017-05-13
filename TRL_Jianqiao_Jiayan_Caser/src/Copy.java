@@ -10,7 +10,7 @@ public class Copy
 		this.copyID = cid;
 	}
 
-	// following generated in Eclipse Source menu
+
 
 	public Patron getOutTo()
 	{
@@ -27,10 +27,10 @@ public class Copy
 		return copyID;
 	}
 
-	public String toString()
-	{
-		return "Copy w/id= " + this.copyID + " out to: " + getOutTo();
-	}
+//	public String toString()
+//	{
+//		return "Copy w/id= " + this.copyID + " out to: " + getOutTo();
+//	}
 
 	@Override
 	public boolean equals(Object o)

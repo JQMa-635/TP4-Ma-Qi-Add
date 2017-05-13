@@ -9,14 +9,18 @@ public class EventLoggingTest
 	private EventLogger eventLog;
 	private String entry;
 	private PatronStore pStore;
+	private UIController uiController;
+	private Copy c;
 	
 	
 	
 	@Before
 	public void setup()
 	{
+		c = new Copy("000");
 		eventLog = new EventLogger();
 		pStore = new PatronStore();
+		uiController = new UIController();
 	}
 	
 	@After
@@ -27,15 +31,15 @@ public class EventLoggingTest
 	@Test
 	public void testCopyCheckInLogging()
 	{
-		entry = "Copy "; //Logging starts
+		uiController.eventHeader("2");; //Logging starts
 	
 		String pid = "S000";
 		Patron p = pStore.fetchPatron(pid);
-		String copyID = "000";
-
-		entry += copyID + " "; // Writing entry
-		entry += "checked in from patron " + p.getPatronName() + ", ID: " + pid + "."; //Entry written;
-		eventLog.addEntry(entry);// Logging ends.
+		
+		uiController.eventBody(c);
+		
+		
+		eventLog.addEntry(uiController.eventEnd("2", p));// Logging ends.
 		
 		assertEquals("Copy 000 checked in from patron Eric, ID: S000.", eventLog.getLog().get(0));
 		

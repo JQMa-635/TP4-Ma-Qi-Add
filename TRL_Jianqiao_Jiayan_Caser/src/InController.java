@@ -33,10 +33,7 @@ public class InController
 	}
 
 	// 1. Worker starts new transaction.
-	public boolean startInTransaction()
-	{
-		return true;
-	}
+
 
 	// 2. Worker enters Patron ID and SuD displays Patron info.
 	public Patron enterPatronForCheckIn(String patronID)
@@ -73,11 +70,6 @@ public class InController
 		{
 			patron.checkCopyIn(copy);
 		}
-	
+		this.copiesEntered.clear();
 	}
-
-//	public static void main(String[] args)
-//	{
-//		// TODO Auto-generated method stub
-//	}
 }

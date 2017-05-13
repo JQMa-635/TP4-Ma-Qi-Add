@@ -74,37 +74,15 @@ public class Patron
 		
 	}
 
-	public String toString()
-	{
-		String toReturn = "Patron w/ name: " + this.name + ", id: " + this.patronID;
-
-		if (this.copiesOut.isEmpty())
-		{
-			toReturn = toReturn + "\nNo copies checked out.\n";
-		}
-		else
-		{
-			toReturn = toReturn + "\nCopies checked out:";
-			for (Copy copy : this.copiesOut)
-			{	
-				toReturn = toReturn + "\n\t" + copy.getCopyID() + "\n";
-			}
-		}
-		
-		if (this.holds.isEmpty())
-			toReturn = toReturn + "\nNo hold.\n";
-		else
-		{
-			toReturn = toReturn + "\nHolds:";
-					for (Hold hold: this.holds)
-						toReturn = toReturn + "\n\t" + hold.getHoldName() + "\n";
-		}
-		return toReturn;
-	}
 	
 	public String getPatronName()
 	{
 		return this.name;
+	}
+	
+	public String getPatronID()
+	{
+		return this.patronID;
 	}
 
 	

@@ -33,13 +33,5 @@ class SellController
 		return this.patron;
 	}
 
-	public Patron getPatronInfo(String patronID) // new added System Event
-	{
-		return pStore.fetchPatron(patronID);
-	}
 	
-	public int getCopiesCount()
-	{
-		return cStore.getCopiesCount();
-	}
 }

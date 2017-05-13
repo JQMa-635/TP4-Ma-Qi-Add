@@ -32,24 +32,6 @@ public class OutController
 		this.copiesEntered = new ArrayList<Copy>();
 	}
 
-	public boolean startOutTransaction()
-	{
-	/* Smell:
-	 * 	
-	 * Self-encapsulation
-	 * 
-	 * Refactoring: Extract Method
-	 */
-
-		clearCopiesEntered();
-		
-		return true;
-	}
-
-	private void clearCopiesEntered()
-	{
-		this.copiesEntered.clear();
-	}
 	
 	public Patron enterPatronForCheckOut(String patronID)
 	{
@@ -78,6 +60,8 @@ public class OutController
 		{
 			currentPatron.checkCopyOut(copy);
 		}
+		
+		this.copiesEntered.clear();
 
 	}
 

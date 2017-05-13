@@ -8,8 +8,11 @@ public class TRLApp
 	private static OutController outController;
 	private static InController inController;
 	private static SellController sellController;
+	private static UIController uiController;
 	private static EventLogger eventLog;
-	private static String entry;
+
+	
+	private static String cmd;
 
 	public static void main(String[] args) throws InterruptedException
 	{
@@ -19,18 +22,20 @@ public class TRLApp
 		outController = new OutController(pStore, cStore);
 		inController = new InController(pStore, cStore);
 		sellController = new SellController(pStore, cStore);
+		uiController = new UIController();
 		
 		eventLog = new EventLogger();
 
-		
+		Scanner input = new Scanner(System.in);
 		StdOut.println("Welcome to TRLApp.");
-		showHelp();
+		uiController.showHelp();
 		boolean quitting = false;
 
 		while (!quitting)
 		{
-			printMenu();
-			String cmd = StdIn.readString();
+			uiController.printMenu();
+
+			cmd = input.next();
 
 			switch (cmd)
 			{
@@ -73,32 +78,12 @@ public class TRLApp
 	/*
 	 * Static methods
 	 */
-	public static void showHelp()
-	{
-		System.out.println("\nThis is the help document for professor testing");
-		System.out.println("Student ID for testing:S000, S001, S002, S003");
-		System.out.println("Copy ID for testing: 001, 002, 003, 004");
-		System.out.println("Hold ID for testing(already included):1, 2");
-		System.out.println("These should be enough.\n");
-	}
-	
-	private static void printMenu()
-	{
-		StdOut.println("Select an option:\n");
-		StdOut.println("1 => Start check out transaction");
-		StdOut.println("2 => Start check in transaction");
-		StdOut.println("3 => Display Patron Info");
-		StdOut.println("4 => Sell copy to patron");
-		StdOut.println("5 => Add hold to patron");
-		StdOut.println("6 => Remove hold from patron");
-		StdOut.println("7 => Add due date to cpoy");
-		StdOut.println("8 => Display event log.");
-		StdOut.println("0 => Quit");
-	}
 	
 	private static void doCheckOut()
 	{
-		entry = "Copy "; // Logging starts
+		// Event logging.
+		uiController.eventHeader(cmd);
+		
 		StdOut.println("Checking copies out...");
 		StdOut.println("Enter Patron ID:");
 		String pid = StdIn.readString();
@@ -125,8 +110,9 @@ public class TRLApp
 			if (c != null)								 // change
 			{
 				StdOut.println("Checking out copy: ");
-				StdOut.println(c);
-				entry += copyID +" "; // Writing entry
+				uiController.showCopy(c);
+				
+				uiController.eventBody(c);
 			}
 			else
 				StdOut.println("Bad copy: reenter:");
@@ -135,13 +121,14 @@ public class TRLApp
 
 		outController.endOutTransaction();
 		System.out.println("****Remember to add due dates for these books, otherwise you will be FINED!!!*****");
-		entry += "checked out to patron " + p.getPatronName() + ", ID: " + pid + "."; // Entry written
-		eventLog.addEntry(entry);// Logging ends
+
+		eventLog.addEntry(uiController.eventEnd(cmd, p));// Logging ends
+		
 	}
 	
 	private static void doCheckIn()
 	{
-		entry = "Copy "; //Logging starts
+		uiController.eventHeader(cmd);
 		StdOut.println("Checking copies in...");
 		StdOut.println("Enter Patron ID:");
 		String pid = StdIn.readString();
@@ -172,8 +159,8 @@ public class TRLApp
 			{
 				c = inController.enterCopyGoingIn(copyID);
 				StdOut.println("Checking in copy: ");
-				StdOut.println(c);
-				entry += copyID + " "; // Writing entry
+				uiController.showCopy(c);
+				uiController.eventBody(c);
 			}
 			else
 				StdOut.println("Bad copy: reenter:");
@@ -182,8 +169,8 @@ public class TRLApp
 		inController.endInTransaction();
 
 		StdOut.println("End of doCheckIn()");
-		entry += "checked in from patron " + p.getPatronName() + ", ID: " + pid + "."; //Entry written;
-		eventLog.addEntry(entry);// Logging ends.
+
+		eventLog.addEntry(uiController.eventEnd(cmd, p));// Logging ends.
 		
 	}
 	
@@ -199,7 +186,7 @@ public class TRLApp
 			StdOut.println("****************ALERT!!! This patron has holds****************");
 			//StdOut.println("Checking out copies to patron: " + p);
 		}
-		StdOut.println(p);
+		uiController.showPatron(p);
 	}
 	
 	/*
@@ -208,7 +195,8 @@ public class TRLApp
 	
 	private static void doSelling()
 	{
-		entry = "Sold "; // Logging starts
+
+		uiController.eventHeader(cmd);
 		Scanner input = new Scanner(System.in);
 		int copyNumbers = 0;
 		StdOut.println("Selling copies...");
@@ -220,7 +208,7 @@ public class TRLApp
 		if (!p.noHolds())
 			StdOut.println("****************ALERT!!! This patron has holds****************");
 		
-		StdOut.println("Selling copies to patron: " + p);
+		StdOut.println("Selling copies to patron: " + uiController.showPatron(p));
 		int copiesSold = 0;
 
 		while (true)
@@ -260,14 +248,16 @@ public class TRLApp
 		}
 		
 		System.out.println("Sold " + copiesSold + ". Sale end. NO RETURNS!!!");
-		entry += copiesSold + " to patron " + p.getPatronName() +", ID: " + pid + ".";// Entry written
-		eventLog.addEntry(entry);// Logging ends
+		
+		uiController.eventBody(copiesSold);
+		eventLog.addEntry(uiController.eventEnd(cmd, p));// Logging ends
 	}
 	
 
 	private static void doAddHold()
 	{
-		entry = "Hold "; // Logging starts
+
+		uiController.eventHeader(cmd);
 		StdOut.print("Enter patron ID:");
 		String pid = StdIn.readString();
 		Patron p = outController.enterPatronForCheckOut(pid);
@@ -285,16 +275,18 @@ public class TRLApp
 				break;
 			Hold h = new Hold(i);
 			p.addHold(h);
-			entry += h.getHoldName() + " "; // Writing entry
+
+			uiController.eventBody(h);
 		}
-		entry +="added to patron " + p.getPatronName() + ", ID: " + pid + ".";// Entry written
-		eventLog.addEntry(entry);// Logging ends
+
+		eventLog.addEntry(uiController.eventEnd(cmd, p));// Logging ends
 	}
 	
 	
 	public static void doRemoveHold()
 	{
-		entry = "Hold "; // Logging starts
+
+		uiController.eventHeader(cmd);
 		Hold hold = null;
 		String fine = "0";
 		System.out.println("Enter patron ID: ");
@@ -305,7 +297,7 @@ public class TRLApp
 		if (p.noHolds())
 		{
 			System.out.print("No holds on record, enter any key to exit");
-			String x = StdIn.readString();
+			//String x = StdIn.readString();
 		}
 		else
 		{
@@ -314,8 +306,8 @@ public class TRLApp
 			while (true)
 			{
 				StdOut.println("Enter hold type:1. Overdue  2. Bad behavior. 0 to finish");
-				int i = StdIn.readInt();
-				if (i == 0)
+				int holdType = StdIn.readInt();
+				if (holdType == 0)
 					break;
 				for (int j = 0; j < p.getHolds().size(); j++)
 				{
@@ -327,18 +319,20 @@ public class TRLApp
 				System.out.print("Enter amout of fine to be paid: ");
 				fine = StdIn.readString();
 				System.out.println("Hold " + hold.getHoldName() + "removed. $" + Double.parseDouble(fine) + " paid.");
-				entry += hold.getHoldName() +" ";// Writting entry
+
+				uiController.eventBody(hold);
 			}
 		}
-		entry += "removed from patron " + p.getPatronName() + ", ID: " + pid +". Paid $" + fine + " fine.";// Entry written
-		eventLog.addEntry(entry);// Logging ends
+
+		eventLog.addEntry(uiController.eventEnd(p, fine));// Logging ends
 	}
 	
 	
 	public static void doAddDueDate()
 	{
-		entry = "Add due date ";//Logging starts
-		String c, d;
+
+		uiController.eventHeader(cmd);
+		String c, date;
 		Copy copy;
 		boolean exit = false;
 		while(!exit)
@@ -353,22 +347,23 @@ public class TRLApp
 			if (copy != null)
 			{
 				System.out.print("Enter due date (mmddyyyy); ");
-				d = StdIn.readString();
-				copy.setDueDate(d);
-				entry +=copy.getDueDateInFormat() +" to copy " + copy.getCopyID() +" ";//Writing entry
+				date = StdIn.readString();
+				copy.setDueDate(date);
+
+				uiController.eventBodyDueDate(copy);
 			}
 			else
 				System.out.println("Bad copy, reenter.");
 			
 		}
 		
-		entry += ".";//Entry written
-		eventLog.addEntry(entry);//Logging ends
+
+		eventLog.addEntry(uiController.eventEnd());//Logging ends
 	}
 	
 	public static void displayEventLog()
 	{
-		eventLog.showLog();
+		uiController.showEventLog(eventLog);
 	}
 	
 }
